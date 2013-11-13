@@ -22,5 +22,19 @@ makeSite("/full/path/to/InterOp", "/full/path/to/outputfolder")
 makeSiteInRunfolder("/full/path/to/Runfolder")
 ```
 
+TODO
+----
+- [] check Q30,Q20 data for correctness, its different from illuminas
+- [] quality heat map in lower left
+- [] table of data
+- [] integrate sample.json
+- [] don't load everything multiple times in the controller
+
+
+
+
+
+
+
 
 
