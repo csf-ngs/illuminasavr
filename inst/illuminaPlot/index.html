@@ -1,0 +1,33 @@
+<html ng-app="illuminaPlot">
+<head>
+  <link href="lib/bootstrap-combined.min.css" rel="stylesheet">
+  <link href="lib/illuminaPlot.css" rel="stylesheet">
+  <link href="lib/jquery-ui-1.10.3.custom.min.css" media="all" type="text/css" rel="stylesheet">
+  <script src="lib/underscore-min.js"></script>
+  <script src="lib/jquery-1.10.2.min.js"></script>
+  <script src="lib/jquery-ui-1.10.3.custom.min.js"></script>
+  <script src="lib/d3.min.js"></script>
+  <script src="lib/angular.min.js"></script>
+  <script src="lib/slider.js"</script>
+  <script src="lib/ui-bootstrap-0.4.0.min.js"></script>
+  <script src="lib/ui-bootstrap-tpls-0.4.0.min.js"></script>
+  <script src="lib/angular-d3.js"></script>
+  <script src="lib/angular-ui-router.min.js"></script>  
+  <script src="lib/science.v1.min.js"></script>
+
+  <script src="illuminaPlot.js"></script>
+  <script src="cycleHeat.js"></script>
+  <script src="cyclePlot.js"></script>
+  <script src="lanePlot.js"></script>
+  <script src="qualityHeat.js"></script>  
+<body>
+   <div class="row">
+     <div class="span6" ui-view="lanePlot"></div>
+     <div class="span6" ui-view="cyclePlot"></div>
+   </div>
+   <div class="row">
+     <div class="span6" ui-view="cycleHeat"></div>
+     <div class="span6" ui-view="qualityHeat"></div>	 
+   <div>   
+ </body>
+</html>

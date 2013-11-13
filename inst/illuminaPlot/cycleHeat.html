@@ -1,0 +1,28 @@
+<div>
+<div class="illuminaPlot">
+    <form class="form-search">
+  <div>
+      <label for="cycleHeatType">show</label>  
+      <select id="cycleHeatType" class="btn btn-mini type" ng-model="plotType" ng-options="p.label for p in plotTypes" ng-change="prepareData()">
+      </select>
+      <label for="cycleHeatLane">lane</label>
+      <select id="cycleHeatLane" class="btn btn-mini lane" ng-model="selectLane" ng-options="lane for lane in laneTypes" ng-change="prepareData()">
+      </select>
+      <label for="cycleHeatSurface">surface</label>
+      <select id="cycleHeatSurface" class="btn btn-mini surface" ng-model="selectSurface" ng-options="surface for surface in surfaceTypes" ng-change="prepareData()">
+      </select>
+      <label for="cycleHeatSwath">swath</label>
+      <select id="cycleHeatSwath" class="btn btn-mini swath" ng-model="selectSwath" ng-options="swath for swath in swathTypes" ng-change="prepareData()">
+      </select> 
+      <div>
+         <div id="cycleHeatIn">
+           <label for="cycleHeatCycleN">cycle</label>
+           <input id="cycleHeatCycleN" type="number" min="1" max="{{maxCycle}}" ng-model="selectCycle" ng-change="prepareData()"/>
+         </div>
+        <div id="sl"><div id="cycleHeatCycleS" ui-slider min="1" max="{{maxCycle}}" ng-change="prepareData()" ng-model="selectCycle"></div></div>
+      </div> 
+   </div>
+  </form>
+  <d3 d3-data="plotData" d3-renderer="plotRenderer" ng-show="true"></d3>
+</div>
+</div>

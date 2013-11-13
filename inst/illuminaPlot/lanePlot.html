@@ -1,0 +1,18 @@
+<div>
+<div class="illuminaPlot">
+   <form class="form-search">
+      <div>  
+         <label for="lanePlotType">show</label> 
+         <select id="lanePlotType" class="btn btn-mini type" ng-model="plotType" ng-options="p.label for p in plotTypes" ng-change="prepareData()">
+         </select>  
+         <label for="lanePlotSurface">surface</label>
+         <select id="lanePlotSurface" class="btn btn-mini surface" ng-model="selectSurface" ng-options="surface for surface in surfaceTypes" ng-change="prepareData()">
+         </select>
+         <label for="lanePlotSwath">swath</label>
+         <select id="linePlotSwath" class="btn btn-mini swath" ng-model="selectSwath" ng-options="swath for swath in swathTypes" ng-change="prepareData()">
+         </select>
+      </div>
+   </form>
+  <d3 d3-data="plotData" d3-renderer="plotRenderer" ng-show="true"></d3>
+</div>
+</div>
