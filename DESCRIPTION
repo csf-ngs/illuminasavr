@@ -11,6 +11,5 @@ Depends:
 License: GPLv3
 LazyData: true
 Collate:
-    'illuminasavr-package.r'
     'parser.R'
     'plot.R'
