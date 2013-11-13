@@ -720,14 +720,13 @@ parseRunInfo <- function(path){
 makeSite <- function(inputFolder, outputPath){
    LOG(paste("making site: ", outputPath))
    
-   outdir <- file.path(outputPath, "illuminaPlot")
-   outdata <- file.path(outdir, "data")
+   outdata <- file.path(outputPath, "illuminaPlot", "data")
    wide <- parseMetricsWide(inputFolder)
 
-   if(! file.exists(outdir)){
+   if(! file.exists(outdata)){
       base <- system.file('illuminaPlot', package='illuminasavr')
       file.copy(base, outputPath, recursive=TRUE)
-      dir.create(file.path(outputPath, "illuminaPlot", "data"), showWarnings = FALSE) #don't know why this does not get copied
+      dir.create(outdata, showWarnings = FALSE) #don't know why this does not get copied
       runInfo <- parseRunInfo(file.path(outputPath, "RunInfo.xml"))
       write.json(runInfo, file.path(outputPath, "illuminaPlot", "data", "runInfo.json"))
    }
