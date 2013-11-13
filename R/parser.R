@@ -727,7 +727,7 @@ makeSite <- function(inputFolder, outputPath){
    if(! file.exists(outdir)){
       base <- system.file('illuminaPlot', package='illuminasavr')
       file.copy(base, outputPath, recursive=TRUE)
-      file.create(dir.path(outputPath, "illuminaPlot", "data"), showWarnings = FALSE) #don't know why this does not get copied
+      dir.create(file.path(outputPath, "illuminaPlot", "data"), showWarnings = FALSE) #don't know why this does not get copied
       runInfo <- parseRunInfo(file.path(outputPath, "RunInfo.xml"))
       write.json(runInfo, file.path(outputPath, "illuminaPlot", "data", "runInfo.json"))
    }
