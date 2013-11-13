@@ -72,11 +72,12 @@ illuminaPlot.config(function($stateProvider, $urlRouterProvider){
             cycleHeat : {
               templateUrl: "cycleHeat.html",
               controller: CycleHeatCtrl
-            },
-		    qualityHeat: {
-              templateUrl: "qualityHeat.html",
-	          controller: QualityHeatCtrl
-			}
+            }
+	      //  ,
+		  //  qualityHeat: {
+          //    templateUrl: "qualityHeat.html",
+	      //    controller: QualityHeatCtrl
+		 //	}
         }
     })
 });
