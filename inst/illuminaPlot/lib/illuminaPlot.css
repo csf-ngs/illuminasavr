@@ -1,0 +1,70 @@
+.xaxis {
+   fill: none;
+   stroke: black;
+   stroke-width: 1;
+} 
+
+.yaxis {
+   fill: none;
+   stroke: black;
+   stroke-width: 1;
+}
+
+.tick.major text {
+   stroke: none;
+   fill: #333333;
+}
+
+select.btn-mini {
+    height: auto;
+    line-height: 14px;
+    max-width: 150px;   
+}
+
+select.lane {
+    max-width: 50px;
+}
+
+select.surface {
+    max-width: 60px;
+}
+
+select.swath {
+   max-width: 50px;
+}
+
+#cycleHeatCycleN {
+  max-width: 45px;   
+  padding: 0px;
+  text-align: right;
+}
+
+#cycleHeatIn {
+  float: left;
+}
+
+#sl {
+  padding-left: 20px;
+  width: 70%;
+  float: left;
+  margin-top: 4px;
+}
+
+.form-search {
+  padding-left: 20px;
+  padding-top: 15px;
+}
+
+.illuminaPlot {
+  border-width: 0px;
+  border-style: solid;
+  border-color: #333333;
+  background-color: #E0FDFF;
+  margin: 10px;
+}
+
+.illuminaCanvas {
+  background-color: white;
+  margin: 9px;
+  padding: 10px;
+}
