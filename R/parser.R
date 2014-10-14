@@ -552,7 +552,7 @@ checkLTC <- function(df1, df2){
 #' TODO find logging library
 #'
 LOG <- function(st){
-  print(st)
+  print(paste(date(), st))
 }
 
 #'
@@ -691,10 +691,12 @@ parseThumbnailName <- function(name){
       t <- splitTiles(tiles, lane)
       b <- m[4] 
       data.frame(t,base=b)
-   }else{
+   } else {
      NA
    }
 }
+
+
 
 #' parse cycel name
 #'
@@ -708,10 +710,23 @@ parseCycleName <- function(name){
    }
 }
 
+
+
+generateTileNames <- function(surfaceCount, swathCount, tileCount){
+   tiles <- 1:tileCount
+   swaths <- 1:swathCount
+   surfaces <- 1:surfaceCount
+      
+
+}
+
 #' mangles absolut jpg path to a relative path
 #' to it can be served 
 #'
 #'
+mangleJpgPath <- function(jpgs){
+   str_extract(jpgs, "Thumbnail_Images/.*")   
+}
 
 #' gets the thumbnails in dir
 #'
@@ -813,6 +828,8 @@ parseRunInfo <- function(path){
 makeSite <- function(inputFolder, outputPath){
    LOG(paste("making site: ", outputPath))
    
+   thumbnailstatus <- file.path(outputPath, "illuminaPlot", "data", "thumbs.status.json") 
+
    outdata <- file.path(outputPath, "illuminaPlot", "data")
    wide <- parseMetricsWide(inputFolder)
 
@@ -824,14 +841,24 @@ makeSite <- function(inputFolder, outputPath){
       write.json(runInfo, file.path(outputPath, "illuminaPlot", "data", "runInfo.json"))
    }
    thumbs <- file.path(outputPath, "illuminaPlot", "Thumbnail_Images")
-   if(file.exists(outdata) && !file.exists(thumbs)){
-      orig <- file.path(outputPath, "..", "Thumbnail_Images")
-      cmd <- paste("ln -s", orig, thumbs)
-      system(cmd  , ignore.stdout = TRUE, ignore.stderr = TRUE)
-   }
-   if(file.exists(thumbs)){
-      writeThumbnailNames(thumbs, outputPath) 
-   }
+   orig <- file.path(outputPath, "Thumbnail_Images")
+#   if(file.exists(outdata) && file.exists(orig) && !file.exists(thumbs)){
+#        LOG(paste("linking thumbnails"))
+#        cmd <- paste("ln -s", orig, thumbs)
+#        system(cmd  , ignore.stdout = TRUE, ignore.stderr = TRUE)
+#   } else {
+#       LOG(paste("not linking thumbnails: ", file.exists(outdata) , file.exists(orig) , file.exists(thumbs)))
+#   }
+#   if(file.exists(thumbs)){
+#       if(file.exists(thumbnailstatus)){
+#          extractedCycle <- wide$rta$RTA$extractedCycle
+#          json_data <- fromJSON(file=)
+#          LOG(paste("writing thumbnails json"))
+#          writeThumbnailNames(thumbs, outputPath)
+#       }else{
+#
+#       } 
+#   }
    metricsToJson(wide, outdata)
    LOG(paste("done making site: ", outputPath))
 }
@@ -840,6 +867,7 @@ makeSite <- function(inputFolder, outputPath){
 #'
 #' @export
 makeSiteInRunfolder <- function(runFolder){
+   LOG(paste("making runfolder", runFolder))
    if(! file.exists(runFolder)){
       msg <- paste("runfolder not accessible", runFolder)
 	  LOG(msg)

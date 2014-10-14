@@ -16,7 +16,3 @@ Imports:
     rjson
 License: GPLv3
 LazyData: true
-Collate:
-    'parser.R'
-    'plot.R'
-    'illuminasavr-package.r'
