@@ -1,6 +1,7 @@
 require("reshape2") 
 require("rjson")
 require("XML")
+require("stringr")
 #require("inline") #for date parsing
 #require("Rcpp") #for date parsing
 
@@ -677,6 +678,98 @@ parseMetricsLong <- function(path){
 
 }
 
+#' parse thumbnail name
+#'
+#' 
+#'  s_1_1106_A.jpg 
+#'
+parseThumbnailName <- function(name){
+   m <- str_match(name, "s_(\\d)_(\\d{4})_(\\w).jpg")
+   if(length(m) == 4){   
+      tiles <- as.integer(m[3])
+      lane <- as.integer(m[2])
+      t <- splitTiles(tiles, lane)
+      b <- m[4] 
+      data.frame(t,base=b)
+   }else{
+     NA
+   }
+}
+
+#' parse cycel name
+#'
+#'
+parseCycleName <- function(name){
+   m <- str_match(name, "C(\\d*)\\.(\\d*)")
+   if(length(m == 3)){
+     as.integer(m[2])
+   } else {
+     NA
+   }
+}
+
+#' mangles absolut jpg path to a relative path
+#' to it can be served 
+#'
+#'
+
+#' gets the thumbnails in dir
+#'
+#'
+parseThumbnailFiles <- function(cycleDir){
+   jpgs <- dir(cycleDir, "s_\\d_\\d*_\\w.jpg", full.names=TRUE)
+   cycle <- parseCycleName(basename(cycleDir))
+   tiles <- do.call("rbind", lapply(basename(jpgs), parseThumbnailName))
+   mangledPath <- mangleJpgPath(jpgs)
+   tiles$path <- mangledPath
+   tiles$cycle <- cycle
+   tiles
+}
+
+
+
+#' parse lane img folder
+#' 
+#' 
+parseLaneThumbnail <- function(path){
+   cycleDirs <- dir(path, "C\\d*\\.\\d*", full.names=TRUE)
+   cycles <- sapply(basename(cycleDirs), parseCycleName)
+   allCycles <- do.call("rbind", lapply(cycleDirs, parseThumbnailFiles))
+   allCycles  
+}
+
+
+
+
+#' parse all lane folders
+#'
+#'
+parseThumbnailNames <- function(path){
+   laneDirs <- dir(path, "L\\d",full.names=TRUE)
+   allLanes <- do.call("rbind", lapply(laneDirs, parseLaneThumbnail))
+   allLanes
+}
+
+#' writes all thumbnail file names and paths into a json file
+#'
+#'
+writeThumbnailNames <- function(thumbPath, outputPath){
+   thumbs <- parseThumbnailNames(thumbPath)
+   write.json(thumbs, file.path(outputPath, "illuminaPlot", "data", "thumbnails.json"))
+}
+
+#' read images in one cycle folder
+#' 
+#'
+readImagesInCycleFolder <- function(path){
+   images <- dir(path, "s_.*jpg", full.names=TRUE)  
+   wNA <- do.call("rbind", lapply(basename(images), parseThumbnailName))
+   wNA <- cbind(wNA, path=images)
+   cycle <- parseCycleName(basename(path))
+   imgdf <- wNA[!is.na(wNA$tileId),]
+   imgdf$cycle <- cycle
+   imgdf
+}
 
 #'
 #' TODO: should be an metrics object method
@@ -729,6 +822,15 @@ makeSite <- function(inputFolder, outputPath){
       dir.create(outdata, showWarnings = FALSE) #don't know why this does not get copied
       runInfo <- parseRunInfo(file.path(outputPath, "RunInfo.xml"))
       write.json(runInfo, file.path(outputPath, "illuminaPlot", "data", "runInfo.json"))
+   }
+   thumbs <- file.path(outputPath, "illuminaPlot", "Thumbnail_Images")
+   if(file.exists(outdata) && !file.exists(thumbs)){
+      orig <- file.path(outputPath, "..", "Thumbnail_Images")
+      cmd <- paste("ln -s", orig, thumbs)
+      system(cmd  , ignore.stdout = TRUE, ignore.stderr = TRUE)
+   }
+   if(file.exists(thumbs)){
+      writeThumbnailNames(thumbs, outputPath) 
    }
    metricsToJson(wide, outdata)
    LOG(paste("done making site: ", outputPath))
