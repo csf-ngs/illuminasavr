@@ -130,7 +130,7 @@ dropSplitTilesNames <- function(df){
 #' parses the meta information from an interop file
 #'
 readMeta <- function(meta){
-   meta <- readBin(con=meta, what="integer", size=1, n=2, signed=TRUE, endian="little")
+   meta <- readBin(con=meta, what="integer", size=1, n=2, signed=FALSE, endian="little")
    list(version=meta[1], recordSize=meta[2])
 }
 
@@ -233,8 +233,10 @@ parseFile <- function(infile, recordSpecification, long=FALSE){
     con <- file(infile, open="rb")
     raw <- readBin(con=con,what="raw",n=fileSize)
     close(con)
+    startAt <- recordSpecification$startAt
+    startAt <- if(is.null(startAt)){ 2 }else{ startAt }
     recordsMetaBin <- raw[1:2]  #byte 0 fileVersionNr byte 1 length of each record
-    recordsData <- raw[-c(1:2)] #byte 0 fileVersionNr byte 1 length of each record
+    recordsData <- raw[-c(1:startAt)] #byte 0 fileVersionNr byte 1 length of each record
     recordsMeta <- readMeta(recordsMetaBin)
     parseRecords(recordsData, recordSpecification, long)
   }
@@ -393,6 +395,59 @@ qualityMetricsParser4 <- function(){
         toStats=toStats
     )
 }
+
+#' Quality Metrics (QMetricsOut.bin)
+#' Contains quality score distribution
+#' Format:
+#' byte 0: file version number (5)
+#' byte 1: length of each record
+#' 23 bytes of unknown function
+#' bytes (N * 206 + 2) - (N *206 + 207): record:
+#' 2 bytes: lane number (uint16)
+#' 2 bytes: tile number (uint16)
+#' 2 bytes: cycle number (uint16)
+#' 4 x 50 bytes: number of clusters assigned score (uint32) Q1 through Q50
+#'
+#' @export
+qualityMetricsParser5 <- function(){
+    id.vars <- c("tileId", "tile","lane","cycle","surface","swath","tileNr","column", "swathColumn")
+    columns <- c("lane", "tile","cycle",
+                 paste("Q",1:50,sep=""))
+    readers <- list(c(readUint16, readUint16, readUint16,
+                 rep(readUint32, times=50)))
+    records <- rbind(columns, readers)
+    forLong <- list(
+               qvals=list(columns=4:53,variable.name="QScore",value.name="count",factor=1:50)
+    )
+    toStats <- function(qMet){
+          if(nrow(qMet) > 0){
+            mat <- as.matrix(subset(qMet, select=grepl("^Q\\d\\d", colnames(qMet))))
+            q30ColIndex <- which(colnames(mat) == "Q30")
+            total <- rowSums(mat)
+            above <- rowSums(mat[,(q30ColIndex+1):ncol(mat)])
+            percQ30 <- above/total*100
+            medianQ <- apply(mat, 1, indexWeightedMedian) # <- this is slow maybe speed up somehow
+            qs <- data.frame(percQ30=above/total*100, medianQ=medianQ)
+            dfs <- data.frame(subset(qMet, select=c("lane","tile","cycle")), qs)
+            addTiles(dfs)
+          }else{
+             allcols <- c("lane","tile","cycle","percQ30", "medianQ",splitTilesNames())
+             df <- data.frame(sapply(allcols, data.frame))
+             colnames(df) <- allcols
+             df[0,]
+          }
+    }
+    list(
+        file = "QMetricsOut.bin",
+        recordSize=206,
+        records=records,
+        long=forLong,
+        id.vars=id.vars,
+        toStats=toStats,
+        startAt=25
+    )
+}
+
 
 
 #' parses corrected Intensity Metrics file
@@ -630,7 +685,7 @@ parseMetricsWide <- function(path){
   extMet <- parseFile(extMet, extractionMetricsParser2(), FALSE)
   
   qmet <-  file.path(path, "QMetricsOut.bin")
-  qmet <- parseFile(qmet, qualityMetricsParser4(), FALSE)
+  qmet <- parseFile(qmet, qualityMetricsParser5(), FALSE)
   qmet <- qualityMetricsParser4()$toStats(qmet) 
 
   tileMet <- file.path(path, "TileMetricsOut.bin")
