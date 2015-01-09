@@ -1,13 +1,13 @@
 Package: illuminasavr
 Title: Parse and Plot illumina SAV interop binary metric files
 Description: parses and plots illumina SAV InterOp binary metric files
-Version: 0.1
+Version: 0.2
 Authors@R: c(person("Ido","Tamir", role=c("aut","cre"),
     email="tamir@imp.ac.at"))
 Author: Ido Tamir <tamir@imp.ac.at>
 Maintainer: Ido Tamir <tamir@imp.ac.at>
 Depends:
-    R (>= 2.10.0)
+    R (>= 3.0.2)
 Imports:
     XML,
     ggplot2,

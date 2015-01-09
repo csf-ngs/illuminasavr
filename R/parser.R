@@ -686,7 +686,7 @@ parseMetricsWide <- function(path){
   
   qmet <-  file.path(path, "QMetricsOut.bin")
   qmet <- parseFile(qmet, qualityMetricsParser5(), FALSE)
-  qmet <- qualityMetricsParser4()$toStats(qmet) 
+  qmet <- qualityMetricsParser5()$toStats(qmet) 
 
   tileMet <- file.path(path, "TileMetricsOut.bin")
   tileMet <- parseFile(tileMet, tileMetricsParser2())
