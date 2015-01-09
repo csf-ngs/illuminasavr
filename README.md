@@ -1,16 +1,12 @@
 illuminasavr
 ============
-R functions for parsing of Illumina SAV (sequence analysis viewer) files, plotting with ggplot2 and generating of an ajaxified website
+R functions for parsing of Illumina SAV (sequence analysis viewer) files, plotting with ggplot2 and generation of
+a website.
 
-The website allows to interactively looking at the data (see screenshot).
-The website now also soft links the Thumbnails_Images folder into the generated folder to be able to view the images.
-
- 
-Depends on: 
-XML,ggplot2,plyr,reshape2,rjson
+The website allows you to interactively explore the data (see screenshot).
 
 Uses:
-R,angular.js,d3.js
+R, angular.js, d3.js
 
 install
 -------
@@ -19,10 +15,10 @@ library("devtools")
 install_github("illuminasavr", "csf-ngs")
 library("illuminasavr")
 
-#generate site in outputfolder
+#generate web-site in outputfolder
 makeSite("/full/path/to/InterOp", "/full/path/to/outputfolder")
 
-#generate site in runfolder
+#generate web-site in runfolder
 makeSiteInRunfolder("/full/path/to/Runfolder")
 ```
 
@@ -32,26 +28,26 @@ screenshot:
 
 TODO
 ----
- - [] check Q30,Q20 data for correctness, its different from illuminas
+ - [] make Q30,Q20 mean/median/truncated mean identical to illuminas (don't really know what illumina uses).
  - [] table of data
- - [] integrate sample.json
+ - [] add request to server for sample info metadata
  - [] don't load everything multiple times in the controller
 
 REMARK:
 -------
-Currently it parses QMetricsOut.bin version 5 files RTA 1.18.64+
-There is a parser for QMetricsOut.bin version 4 in the source code.
-Just change 
+- The website now also soft links the Thumbnails_Images folder into the generated folder to be able to view the images.
 
-```R
-  qmet <- parseFile(qmet, qualityMetricsParser5(), FALSE)
-  qmet <- qualityMetricsParser5()$toStats(qmet)
+- Currently it parses QMetricsOut.bin version 5 files RTA 1.18.64+
+  There is a parser for QMetricsOut.bin version 4 in the source code.
+  In parser.R just change 
 
-//to
-
-  qmet <- parseFile(qmet, qualityMetricsParser4(), FALSE)
-  qmet <- qualityMetricsParser4()$toStats(qmet)
-```
+   ```R
+     qmet <- parseFile(qmet, qualityMetricsParser5(), FALSE)
+     qmet <- qualityMetricsParser5()$toStats(qmet)
+    //to  
+     qmet <- parseFile(qmet, qualityMetricsParser4(), FALSE)
+     qmet <- qualityMetricsParser4()$toStats(qmet)
+   ```
 
 
 
