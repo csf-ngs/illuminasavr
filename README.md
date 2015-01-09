@@ -26,6 +26,10 @@ makeSite("/full/path/to/InterOp", "/full/path/to/outputfolder")
 makeSiteInRunfolder("/full/path/to/Runfolder")
 ```
 
+screenshot:
+-----------
+![Screenshot of interactive angular.js app](https://raw.githubusercontent.com/csf-ngs/illuminasavr/master/doc/screenshot.jpg)
+
 TODO
 ----
  - [] check Q30,Q20 data for correctness, its different from illuminas
@@ -49,11 +53,6 @@ Just change
   qmet <- qualityMetricsParser4()$toStats(qmet)
 ```
 
-
-screenshot:
------------
-
-![Screenshot of interactive angular.js app](https://raw.githubusercontent.com/csf-ngs/illuminasavr/master/doc/screenshot.jpg)
 
 
 
