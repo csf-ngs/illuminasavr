@@ -3,7 +3,7 @@
    <form class="form-search">
       <div>  
          <label for="lanePlotType">show</label> 
-         <select id="lanePlotType" class="btn btn-mini type" ng-model="plotType" ng-options="p.label for p in plotTypes" ng-change="prepareData()">
+         <select id="lanePlotType" style="width: 300px" class="btn btn-mini type" ng-model="plotType" ng-options="p.label for p in plotTypes" ng-change="prepareData()">
          </select>  
          <label for="lanePlotSurface">surface</label>
          <select id="lanePlotSurface" class="btn btn-mini surface" ng-model="selectSurface" ng-options="surface for surface in surfaceTypes" ng-change="prepareData()">

@@ -229,8 +229,9 @@ function LanePlotCtrl($scope, iData ) {
 
   $scope.plotRenderer = function(el, data) {
     var marginLeft = 90;
+	var marginRight = 15;
     var marginTop = 25;
-    var marginBottom = 25;
+    var marginBottom = 34;
     var width = $scope.svgWidth;
     var height = $scope.svgHeight;
     var pairWidth = 20;
@@ -255,7 +256,7 @@ function LanePlotCtrl($scope, iData ) {
     var xRange = [0.5, plotData.length + 0.5];
     var yRange = [max, 0];
 
-    var x = d3.scale.linear().domain(xRange).range([0, width - marginLeft]);
+    var x = d3.scale.linear().domain(xRange).range([0, width - (marginLeft + marginRight)]);
     var yH = height - ( marginTop + marginBottom);
     var y = d3.scale.linear().domain([max, 0]).range( [0, yH ]);
 
@@ -297,7 +298,7 @@ function LanePlotCtrl($scope, iData ) {
              .duration(500)
              .call(yAxis);
 
-    IllP.plotLegend(plot, [{ key: "all", colour: "blue", opacity: 0.5 }, { key: "pf", colour: "red", opacity: 0.5 }], plotId, width - marginLeft);
+    IllP.plotLegend(plot, [{ key: "all", colour: "blue", opacity: 0.5 }, { key: "pf", colour: "red", opacity: 0.5 }], plotId, width - (marginLeft + marginRight));
 
     switch( $scope.plotType.chartType ){
        case "violin": pl = violin; break;
@@ -305,7 +306,7 @@ function LanePlotCtrl($scope, iData ) {
     }
 
     for(var i = 0; i < plotData.length; i++){
-        var boxwidth = (width - marginLeft)/(plotData.length);
+        var boxwidth = (width - (marginLeft + marginRight))/(plotData.length);
         var xpos = boxwidth * i;
         pl(plot, plotData[i].all, yH, boxwidth, xpos, max, i, "all", "blue");
         pl(plot, plotData[i].pf, yH, boxwidth, xpos, max, i, "pf", "red");

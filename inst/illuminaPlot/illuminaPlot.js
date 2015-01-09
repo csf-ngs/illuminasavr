@@ -1,7 +1,6 @@
 var illuminaData = angular.module('illuminaData',[]);
 
 illuminaData.factory('iData', function($http){
-    var cycleData = {};
     
     var cycleUrl = "data/cycleMetrics.json";
     var cycleData = {  
@@ -46,10 +45,31 @@ illuminaData.factory('iData', function($http){
 
 });
 
+illuminaData.factory('iRun', function($http){
+    
+    var runUrl = "data/runInfo.json";
+    var runInfo = {
+      async: function(){
+            var promise = $http({method: 'GET', url: runUrl}).then(function(response){
+                console.log("made call to: "+runUrl);  
+                return response.data;
+            });
+            return promise;
+	}};
+	var statusUrl = "data/status.json";
+	var statusInfo = {  
+      async: function(){
+            var promise = $http({method: 'GET', url: statusUrl}).then(function(response){
+                console.log("made call to: "+statusUrl);  
+                return response.data;
+            });
+            return promise;
+	}};
+	return { runInfo: runInfo, statusInfo: statusInfo };
+});
 
 
-
-var illuminaPlot = angular.module('illuminaPlot',['illuminaData','ui.state','d3','ui.slider']); 
+var illuminaPlot = angular.module('illuminaPlot',['illuminaData','ngCookies','ui.router','d3','ui.bootstrap','ui.bootstrap-slider']); 
 
 illuminaPlot.config(function($stateProvider, $urlRouterProvider){
   //
@@ -72,12 +92,11 @@ illuminaPlot.config(function($stateProvider, $urlRouterProvider){
             cycleHeat : {
               templateUrl: "cycleHeat.html",
               controller: CycleHeatCtrl
-            }
-	      //  ,
-		  //  qualityHeat: {
-          //    templateUrl: "qualityHeat.html",
-	      //    controller: QualityHeatCtrl
-		 //	}
+            },
+		    thumbImage : {
+              templateUrl: "thumbImage.html",
+	          controller: ThumbImageCtrl
+		    }
         }
     })
 });

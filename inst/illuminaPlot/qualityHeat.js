@@ -91,7 +91,7 @@ function QualityHeatCtrl($scope, iData) {
    
 
   $scope.plotRenderer = function(el, data) {
-    var marginLeft = 90;
+    var marginLeft = 60;
     var marginTop = 25;
     var marginBottom = 25;
     var width = $scope.svgWidth;

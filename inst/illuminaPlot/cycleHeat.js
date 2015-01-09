@@ -112,7 +112,7 @@ function CycleHeatCtrl($scope, iData) {
   $scope.plotRenderer = function(el, data) {
     var plotId = "cycleHeatmap";
 
-    var marginLeft = 40;
+    var marginLeft = 20;
     var marginTop = 18;
 
     var width = $scope.svgWidth;

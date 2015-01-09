@@ -19,7 +19,9 @@
            <label for="cycleHeatCycleN">cycle</label>
            <input id="cycleHeatCycleN" type="number" min="1" max="{{maxCycle}}" ng-model="selectCycle" ng-change="prepareData()"/>
          </div>
-        <div id="sl"><div id="cycleHeatCycleS" ui-slider min="1" max="{{maxCycle}}" ng-change="prepareData()" ng-model="selectCycle"></div></div>
+		 <div>
+			<slider id="sl" min="1" step="1" max="maxCycle" on-stop-slide="prepareData()" on-slide="prepareData()" ng-model="selectCycle"></slider>
+	     </div>		 
       </div> 
    </div>
   </form>

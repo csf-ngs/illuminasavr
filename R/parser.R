@@ -871,7 +871,11 @@ parseRunInfo <- function(path){
 	   reads$NumCycles <- as.integer(reads$NumCycles)
 	   totalCycles <- sum(reads$NumCycles)
 	   flowcell <- xmlValue(getNodeSet(x,"//Flowcell")[[1]])
-	   list(flowcell=flowcell, totalCycles=totalCycles, reads=reads)	    
+       lay <- getNodeSet(x, "//FlowcellLayout")
+       layout <- xmlAttrs(lay[[1]])
+       layoutN <- as.integer(layout)
+       names(layoutN) <- names(layout)
+       list(flowcell=flowcell, totalCycles=totalCycles, reads=reads, layout=layoutN)	    
    }else{
       list(flowcell="NA",totalCycles=0,reads=data.frame(Number=NA,NumCycles=NA,IsIndexedRead=NA))
    }
@@ -897,13 +901,13 @@ makeSite <- function(inputFolder, outputPath){
    }
    thumbs <- file.path(outputPath, "illuminaPlot", "Thumbnail_Images")
    orig <- file.path(outputPath, "Thumbnail_Images")
-#   if(file.exists(outdata) && file.exists(orig) && !file.exists(thumbs)){
-#        LOG(paste("linking thumbnails"))
-#        cmd <- paste("ln -s", orig, thumbs)
-#        system(cmd  , ignore.stdout = TRUE, ignore.stderr = TRUE)
-#   } else {
-#       LOG(paste("not linking thumbnails: ", file.exists(outdata) , file.exists(orig) , file.exists(thumbs)))
-#   }
+   if(file.exists(outdata) && file.exists(orig) && !file.exists(thumbs)){
+        LOG(paste("linking thumbnails"))
+        cmd <- paste("ln -s", orig, thumbs)
+        system(cmd  , ignore.stdout = TRUE, ignore.stderr = TRUE)
+   } else {
+       LOG(paste("not linking thumbnails: ", file.exists(outdata) , file.exists(orig) , file.exists(thumbs)))
+   }
 #   if(file.exists(thumbs)){
 #       if(file.exists(thumbnailstatus)){
 #          extractedCycle <- wide$rta$RTA$extractedCycle

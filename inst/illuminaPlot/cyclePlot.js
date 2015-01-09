@@ -123,9 +123,10 @@ function CyclePlotCtrl($scope, iData) {
   };
 
   $scope.plotRenderer = function(el, data) {
-    var marginLeft = 90;
+    var marginLeft = 60;
     var marginTop = 25;
-    var marginBottom = 25;
+	var marginRight = 15;
+    var marginBottom = 35;
     var width = $scope.svgWidth;
     var height = $scope.svgHeight;
     var plotId = 'lineplot';
@@ -142,7 +143,7 @@ function CyclePlotCtrl($scope, iData) {
    //could not make stack work the way I wanted
    var xRange = [1, $scope.maxCycle];
    var yRange = [$scope.allMax, 0];  
-   var x = d3.scale.linear().domain(xRange).range([0,width - marginLeft]);
+   var x = d3.scale.linear().domain(xRange).range([0,width - (marginLeft + marginRight)]);
    var yH = height - ( marginTop + marginBottom);
    var y = d3.scale.linear().domain(yRange).range([0, yH]);
     
@@ -256,7 +257,7 @@ function CyclePlotCtrl($scope, iData) {
 
 
     var legend = IllP.createLabels($scope.plotType.columnLabels, $scope.plotType.colours);
-    IllP.plotLegend(plot, legend, plotId, width - marginLeft);
+    IllP.plotLegend(plot, legend, plotId, width - (marginLeft+marginRight));
 
 
     

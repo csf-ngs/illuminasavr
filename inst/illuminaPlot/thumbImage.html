@@ -1,0 +1,27 @@
+<div>
+<div class="illuminaPlot">
+   <form class="form-search"> 
+   <div>
+    <label for="imgCycle">cycle</label>
+	   <input id="imgCycle" style="width: 50px; padding-top: 0px; padding-bottom: 0px;" type="number" min="1" max="{{maxCycle}}" ng-model="selectCycle" ng-change="newImagePath()">
+    </select>
+    <label for="imgLane">lane</label>
+    <select id="imgLane" style="width: 40px" class="btn btn-mini lane" ng-model="selectLane" ng-options="lane for lane in lanes" ng-change="newImagePath()">
+    </select>
+    <label for="imgSurface"></label>
+    <select id="imgSurface" class="btn btn-mini surface" ng-model="selectSurface" ng-options="surface for surface in surfaces" ng-change="newImagePath()">
+    </select>
+    <label for="imgSwath">swath</label>
+    <select id="imgSwath" style="width: 45px" class="btn btn-mini swath" ng-model="selectSwath" ng-options="swath for swath in swaths" ng-change="newImagePath()">
+    </select>
+    <label for="imgTile">tile</label>
+    <select id="imgTile" style="width: 55px" class="btn btn-mini tile" ng-model="selectTile" ng-options="tile for tile in tiles" ng-change="newImagePath()">
+    </select>
+    <label for="imgChannel">channel</label>
+    <select id="imgChannel" style="width: 45px" class="btn btn-mini channel" ng-model="selectChannel" ng-options="channel for channel in channels" ng-change="newImagePath()">
+    </select>
+   </div>
+   </form>
+  <img ng-src="{{imagePath}}" style="display:block; margin:auto;" width="512px"/>
+</div>
+</div>
