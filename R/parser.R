@@ -79,8 +79,6 @@ readDateInline <- list(
       })
       date
    }
-
-
 )
 
 
@@ -234,9 +232,10 @@ parseFile <- function(infile, recordSpecification, long=FALSE){
     raw <- readBin(con=con,what="raw",n=fileSize)
     close(con)
     startAt <- recordSpecification$startAt
-    startAt <- if(is.null(startAt)){ 2 }else{ startAt }
+    startAt <- if(is.null(startAt)){ 2 }else{ startAt(raw) }
     recordsMetaBin <- raw[1:2]  #byte 0 fileVersionNr byte 1 length of each record
     recordsData <- raw[-c(1:startAt)] #byte 0 fileVersionNr byte 1 length of each record
+    # length(raw) %% 206
     recordsMeta <- readMeta(recordsMetaBin)
     parseRecords(recordsData, recordSpecification, long)
   }
@@ -444,10 +443,53 @@ qualityMetricsParser5 <- function(){
         long=forLong,
         id.vars=id.vars,
         toStats=toStats,
-        startAt=25
+        startAt=startBytesQualityBin
     )
 }
 
+#' lower boundary of quality score bins
+#'
+lowerQualityBoundary <- function(binCount){
+   4 - (4+binCount-1)
+}
+
+#' upper boundary of quality score bins
+#'
+upperQualityBoundary <- function(binCount){
+  (4+binCount) - (4+2*binCount-1)
+}
+
+#' remapped scores of quality score bins
+#' 
+#'
+remappedQualityBins <- function(binCount){
+   (4+2*binCount) - (4+3*binCount-1)
+}
+
+
+#' number of binning byte info
+#'
+#' 
+qualityBinByteCount <- function(binCount){
+   lower <-  4 - (4+binCount-1)
+   upper <- (4+binCount) - (4+2*binCount-1)
+   remapped <- (4+2*binCount) - (4+3*binCount - 1)
+   lower + upper + remapped 
+}
+
+#' gets raw data, returns how many bytes to skip
+#'  
+#' 
+#' 
+startBytesQualityBin <- function(raw){
+    withBinning <- as.integer(raw)[3]  
+    if(withBinning == 1){
+       binNum <- as.integer(raw)[4]
+       binNum * 3 + 4  
+    } else {
+       3
+    }
+}
 
 
 #' parses corrected Intensity Metrics file
@@ -807,7 +849,6 @@ parseLaneThumbnail <- function(path){
    allCycles <- do.call("rbind", lapply(cycleDirs, parseThumbnailFiles))
    allCycles  
 }
-
 
 
 
