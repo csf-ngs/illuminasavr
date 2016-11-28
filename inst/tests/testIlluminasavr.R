@@ -1,6 +1,19 @@
 context("illuminasavr")
 
+testFilesPath <- function(f){ paste("../../inst/testFiles", f, sep="") }
 
+
+test_that("parse runParameters.xml", {
+   rp <- parseRunParameters(testFilesPath("/runParameters.xml"))
+   expect_equal(rp$version, "1.18.64")
+   expect_equal(rp$cloudRunId, "21388382")
+   expect_equal(rp$experimentName, "SR50")
+   bp <- basespaceUrl(rp)
+   expect_equal(bp, "https://basespace.illumina.com/run/21388382/SR50")
+   rp <- parseRunParameters(testFilesPath("/doesntexist"))
+   bp <- basespaceUrl(rp)
+   expect_equal(bp, "")
+})
 
 test_that("parse thumbnail name", {
    exp <- data.frame(surface="top", swath=1, tileNr=6, column=1, swathColumn=1, tileId=11106, base=factor("A"))

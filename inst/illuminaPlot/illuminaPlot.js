@@ -65,7 +65,17 @@ illuminaData.factory('iRun', function($http){
             });
             return promise;
 	}};
-	return { runInfo: runInfo, statusInfo: statusInfo };
+    var paramUrl = "data/runParameters.json";
+    var runParameters = {
+       async: function(){
+           var promise = $http({method: 'GET', url: paramUrl}).then(function(response){
+               console.log("made call to: "+paramUrl);
+               return response.data;
+           });
+           return promise;
+    }}; 
+ 
+	return { runInfo: runInfo, statusInfo: statusInfo, runParameters: runParameters };
 });
 
 

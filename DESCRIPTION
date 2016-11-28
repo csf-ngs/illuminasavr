@@ -13,6 +13,8 @@ Imports:
     ggplot2,
     plyr,
     reshape2,
-    rjson
+    rjson,
+    brew
 License: GPLv3
 LazyData: true
+RoxygenNote: 5.0.1

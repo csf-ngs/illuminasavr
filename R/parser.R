@@ -2,6 +2,7 @@ require("reshape2")
 require("rjson")
 require("XML")
 require("stringr")
+require("brew")
 #require("inline") #for date parsing
 #require("Rcpp") #for date parsing
 
@@ -716,7 +717,7 @@ joinLaneTileCycle <- function(a,b){
 #'
 #'
 #' @export
-parseMetricsWide <- function(path){
+parseMetricsWide <- function(path, version="newest"){
   corrInt <- file.path(path, "CorrectedIntMetricsOut.bin")
   corrInt <- parseFile(corrInt, correctedIntensityMetricsParser2(), FALSE)
   
@@ -727,8 +728,10 @@ parseMetricsWide <- function(path){
   extMet <- parseFile(extMet, extractionMetricsParser2(), FALSE)
   
   qmet <-  file.path(path, "QMetricsOut.bin")
-  qmet <- parseFile(qmet, qualityMetricsParser5(), FALSE)
-  qmet <- qualityMetricsParser5()$toStats(qmet) 
+  qmParser <- if(version != "newest"){ qualityMetricsParser4()  }else{ qualityMetricsParser5() }
+
+  qmet <- parseFile(qmet, qmParser, FALSE)
+  qmet <- qmParser$toStats(qmet) 
 
   tileMet <- file.path(path, "TileMetricsOut.bin")
   tileMet <- parseFile(tileMet, tileMetricsParser2())
@@ -903,6 +906,40 @@ write.json <- function(df, path){
    sink()
 }
 
+#' parses runParameters.xml
+#' gets RTA version
+#'
+#' @export
+parseRunParameters <- function(path){
+  if(file.exists(path)){
+    x <- xmlParse(path)
+    version <- xpathSApply(x,"//RTAVersion",xmlValue) 
+    cloudRunId <-  xpathSApply(x,"//RunId",xmlValue)
+    experimentName <- xpathSApply(x,"//ExperimentName",xmlValue)
+    list(version=version,cloudRunId=cloudRunId,experimentName=experimentName)
+  }else{
+    list()
+  }
+}
+
+
+#' basespaceURL 
+#' https://basespace.illumina.com/run/${id}/${exp}
+#' /charts optional
+#'
+basespaceUrl <- function(runParameters){
+   if(!is.null(runParameters$cloudRunId) & !is.null(runParameters$experimentName)){
+     paste("https://basespace.illumina.com/run/", runParameters$cloudRunId, "/", runParameters$experimentName, sep="")
+   } else {
+     ""
+  }
+}
+
+
+
+#' parses the run info
+#'
+#' @export
 parseRunInfo <- function(path){
    if(file.exists(path)){
        x <-  xmlParse(path)
@@ -922,24 +959,50 @@ parseRunInfo <- function(path){
    }
 }
 
-#' creates html site from input somewhere on the file system
+
+#' sets data/status.json to last cycle
+#' because MiSeq has different format which crashes metrics parsing, in order to see pictures
+#' call this function
+#' 
+#' {"RTA":{"extractedCycle":16,"correctedCycle":1}}
+#'
 #'
 #' @export
-makeSite <- function(inputFolder, outputPath){
+setStatusFinished <- function(runFolder){
+   outputPath <- file.path(runFolder, "InterOp")
+   runInfo <- parseRunInfo(file.path(runFolder, "RunInfo.xml"))
+   tot <- runInfo$totalCycles   
+   rta <- list(RTA=list(extractedCycle=tot,correctedCycle=tot))
+   write.json(rta, file.path(runFolder, "illuminaPlot", "data", "status.json"))
+}
+
+
+#' creates html site from input somewhere on the file system
+#'
+#' force: create runfolder again
+#'
+#' @export
+makeSite <- function(inputFolder, outputPath, force=FALSE){
    LOG(paste("making site: ", outputPath))
    
    thumbnailstatus <- file.path(outputPath, "illuminaPlot", "data", "thumbs.status.json") 
 
    outdata <- file.path(outputPath, "illuminaPlot", "data")
-   wide <- parseMetricsWide(inputFolder)
 
-   if(! file.exists(outdata)){
+   if(! file.exists(outdata) | force){
       base <- system.file('illuminaPlot', package='illuminasavr')
       file.copy(base, outputPath, recursive=TRUE)
       dir.create(outdata, showWarnings = FALSE) #don't know why this does not get copied
       runInfo <- parseRunInfo(file.path(outputPath, "RunInfo.xml"))
       write.json(runInfo, file.path(outputPath, "illuminaPlot", "data", "runInfo.json"))
+      runPar <- parseRunParameters(file.path(outputPath, "runParameters.xml")) 
+      bspurlnc <- basespaceUrl(runPar)
+      bspurl <- paste(bspurlnc, "/charts", sep="")
+      runPar$baseSpaceUrl <- bspurlnc
+      write.json(runPar, file.path(outputPath, "illuminaPlot", "data", "runParameters.json")) 
+      brew(file.path(base, "index.html"), file.path(outputPath, "illuminaPlot", "index.html"))
    }
+   
    thumbs <- file.path(outputPath, "illuminaPlot", "Thumbnail_Images")
    orig <- file.path(outputPath, "Thumbnail_Images")
    if(file.exists(outdata) && file.exists(orig) && !file.exists(thumbs)){
@@ -959,6 +1022,7 @@ makeSite <- function(inputFolder, outputPath){
 #
 #       } 
 #   }
+   wide <- parseMetricsWide(inputFolder)
    metricsToJson(wide, outdata)
    LOG(paste("done making site: ", outputPath))
 }
@@ -966,14 +1030,14 @@ makeSite <- function(inputFolder, outputPath){
 #' creates a html site within the Run Folder
 #'
 #' @export
-makeSiteInRunfolder <- function(runFolder){
+makeSiteInRunfolder <- function(runFolder, force=FALSE){
    LOG(paste("making runfolder", runFolder))
    if(! file.exists(runFolder)){
       msg <- paste("runfolder not accessible", runFolder)
 	  LOG(msg)
 	  stop(msg)	  
    }
-   makeSite(file.path(runFolder, "InterOp"), runFolder)
+   makeSite(file.path(runFolder, "InterOp"), runFolder, force)
 }
 
 

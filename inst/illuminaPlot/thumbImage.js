@@ -1,14 +1,15 @@
 function ThumbImageCtrl($scope, iRun) {
 		
     $scope.channels = ["A","C","G","T"];
-	$scope.surfaces = ["top","bottom"];
+    $scope.surfaces = ["top","bottom"];
 	$scope.maxCycle = 1;
 	$scope.lanes = [1];
 	$scope.tiles = [1];
 	$scope.swaths = [1];
+    $scope.selectChannel = "A";
 	
     iRun.statusInfo.async().then(function(statusInfo){
-		$scope.maxCycle = statusInfo.RTA.correctedCycle;
+		$scope.maxCycle = statusInfo.RTA.extractedCycle;
 		$scope.newImagePath();
     });
 	
@@ -16,14 +17,18 @@ function ThumbImageCtrl($scope, iRun) {
 		$scope.lanes = _.range(1, runInfo.layout.LaneCount + 1);
 		$scope.tiles = _.range(1, runInfo.layout.TileCount + 1);
 		$scope.swaths = _.range(1, runInfo.layout.SwathCount + 1);
-	});
+	    if($scope.lanes.length == 1){ //MySeq!!!
+          $scope.channels = ["a","c","g","t"];
+          $scope.selectChannel = "a";
+          $scope.newImagePath();
+        };
+    }); 
     		
     $scope.selectCycle = 1;
 	$scope.selectLane = 1;
 	$scope.selectSurface = "top";
 	$scope.selectSwath = 1;
 	$scope.selectTile = 1;
-	$scope.selectChannel = "A";
  
         
     /**
