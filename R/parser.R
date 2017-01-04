@@ -1017,7 +1017,7 @@ makeSite <- function(inputFolder, outputPath, force=FALSE){
        LOG(paste("not linking thumbnails: ", file.exists(outdata) , file.exists(orig) , file.exists(thumbs)))
    }
    #always set status.json to maximum, but let it be overwritten if parseMetricsWide succeeds. Important for thumbnail looking on miseq
-   setStatusFinished(inputFolder)
+   setStatusFinished(dirname(inputFolder)) #dirname is a bit stupid, but inputFolder is runFolder+/+InterOp
    wide <- parseMetricsWide(inputFolder)
    metricsToJson(wide, outdata)
    LOG(paste("done making site: ", outputPath))
@@ -1027,7 +1027,7 @@ makeSite <- function(inputFolder, outputPath, force=FALSE){
 #'
 #' @export
 makeSiteInRunfolder <- function(runFolder, force=FALSE){
-   LOG(paste("making runfolder", runFolder))
+   LOG(paste("parsing runfolder", runFolder))
    if(! file.exists(runFolder)){
       msg <- paste("runfolder not accessible", runFolder)
 	  LOG(msg)
