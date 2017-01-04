@@ -1016,6 +1016,7 @@ makeSite <- function(inputFolder, outputPath, force=FALSE){
    } else {
        LOG(paste("not linking thumbnails: ", file.exists(outdata) , file.exists(orig) , file.exists(thumbs)))
    }
+   #always set status.json to maximum, but let it be overwritten if parseMetricsWide succeeds. Important for thumbnail looking on miseq
    setStatusFinished(inputFolder)
    wide <- parseMetricsWide(inputFolder)
    metricsToJson(wide, outdata)
