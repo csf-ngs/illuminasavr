@@ -914,7 +914,12 @@ parseRunParameters <- function(path){
   if(file.exists(path)){
     x <- xmlParse(path)
     version <- xpathSApply(x,"//RTAVersion",xmlValue) 
+    #hiseq:
     cloudRunId <-  xpathSApply(x,"//RunId",xmlValue)
+    #miseq:
+    if(length(cloudRunId) == 0){
+       cloudRunId <- xpathSApply(x,"//CloudRunId",xmlValue)
+    }
     experimentName <- xpathSApply(x,"//ExperimentName",xmlValue)
     list(version=version,cloudRunId=cloudRunId,experimentName=experimentName)
   }else{
@@ -983,8 +988,7 @@ setStatusFinished <- function(runFolder){
 #'
 #' @export
 makeSite <- function(inputFolder, outputPath, force=FALSE){
-   LOG(paste("making site: ", outputPath))
-   
+  
    thumbnailstatus <- file.path(outputPath, "illuminaPlot", "data", "thumbs.status.json") 
 
    outdata <- file.path(outputPath, "illuminaPlot", "data")
@@ -1012,16 +1016,7 @@ makeSite <- function(inputFolder, outputPath, force=FALSE){
    } else {
        LOG(paste("not linking thumbnails: ", file.exists(outdata) , file.exists(orig) , file.exists(thumbs)))
    }
-#   if(file.exists(thumbs)){
-#       if(file.exists(thumbnailstatus)){
-#          extractedCycle <- wide$rta$RTA$extractedCycle
-#          json_data <- fromJSON(file=)
-#          LOG(paste("writing thumbnails json"))
-#          writeThumbnailNames(thumbs, outputPath)
-#       }else{
-#
-#       } 
-#   }
+   setStatusFinished(inputFolder)
    wide <- parseMetricsWide(inputFolder)
    metricsToJson(wide, outdata)
    LOG(paste("done making site: ", outputPath))
