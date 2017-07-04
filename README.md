@@ -48,7 +48,7 @@ REMARK:
      qmet <- parseFile(qmet, qualityMetricsParser4(), FALSE)
      qmet <- qualityMetricsParser4()$toStats(qmet)
    ```
-
+- MiSeq is not supported
 
 
 
