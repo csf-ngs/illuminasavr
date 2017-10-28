@@ -14,7 +14,8 @@ Imports:
     plyr,
     reshape2,
     rjson,
-    brew
+    brew,
+    lubridate
 License: GPLv3
 LazyData: true
 RoxygenNote: 5.0.1

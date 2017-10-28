@@ -3,8 +3,10 @@ require("rjson")
 require("XML")
 require("stringr")
 require("brew")
+require("lubridate")
 #require("inline") #for date parsing
 #require("Rcpp") #for date parsing
+
 
 #' reads uint16 vector from a raw vector matrix.
 #'
@@ -650,7 +652,7 @@ checkLTC <- function(df1, df2){
 #' TODO find logging library
 #'
 LOG <- function(st){
-  print(paste(date(), st))
+  print(paste(now(), st))
 }
 
 #'
@@ -921,8 +923,15 @@ parseRunParameters <- function(path){
        cloudRunId <- xpathSApply(x,"//CloudRunId",xmlValue)
     }
     experimentName <- xpathSApply(x,"//ExperimentName",xmlValue)
-    list(version=version,cloudRunId=cloudRunId,experimentName=experimentName)
-  }else{
+    templateCycleCount <- xpathSApply(x,"//TemplateCycleCount", xmlValue) 
+    bay <- xpathSApply(x,"//FCPosition", xmlValue)
+    instrument <- xpathSApply(x,"//ScannerID", xmlValue)
+    runNr <- xpathSApply(x,"//ScanNumber", xmlValue)
+    flowcell <- xpathSApply(x,"//Barcode",  xmlValue) #WTF?
+    list(version=version,cloudRunId=cloudRunId,experimentName=experimentName,
+        templateCycleCount=as.integer(templateCycleCount),bay=bay,instrument=instrument,
+        runNr=as.integer(runNr),flowcell=flowcell)
+  } else {
     list()
   }
 }
@@ -940,7 +949,52 @@ basespaceUrl <- function(runParameters){
   }
 }
 
+#' reads cycle times into table
+#'
+#' @export
+parseCycleTimes <- function(path){
+  if(file.exists(path)){
+     ct <- read.table(path, header=TRUE, sep="\t", strings=FALSE)
+     dt <-  mdy_hms(paste(ct$Date,ct$Time))     
+     ct$dateTime <- dt  
+     ct
+  } else {
+     NULL
+  }
+}
 
+#' statistics on cycle times
+#'
+#' @export
+cycleTimesStats <- function(cycleTimes){
+  secondsPerCycle <- ddply(cycleTimes, .(Cycle), summarize, seconds=interval(dateTime[1],dateTime[4]) ) 
+  runLength <- interval(cycleTimes$dateTime[1],cycleTimes$dateTime[nrow(cycleTimes)]) 
+  list(secondsPerCycle=secondsPerCycle,runLength=runLength,meanSecondsPerCycle=mean(secondsPerCycle$seconds))
+}
+
+#' run folders by date 
+#' 
+#' fromTo: lubridate::interval(lubridate::dmy("31/3/2015"),lubridate::ymd("2016/4/17"))
+#'
+#' @export
+runFoldersInInterval <- function(paths, fromTo){
+   runFolders <- str_detect(paths, "\\d{6}_\\w{8}_\\d{4}_\\w{10}")
+   folders <- paths[runFolders]
+   dates <- ymd(unlist(lapply(strsplit(basename(folders), "_"), function(folder){ folder[[1]][1] })))
+   ins <- dates %within% fromTo
+   folders[ins]
+}
+
+#' reads all metadata from folder
+#'
+#' @export
+allMetaFromFolder <- function(path){
+  rp <- parseRunParameters(paste(path, "runParameters.xml",sep="/"))
+  ri <- parseRunInfo(paste(path, "RunInfo.xml", sep="/"))
+  ct <- parseCycleTimes(paste(path, "/Logs/CycleTimes.txt",sep=""))
+  cts <- if(! is.null(ct)){ cycleTimesStats(ct) }else{ NULL }
+  list(runParameters=rp, runInfo=ri, cycleTimes=ct, cycleTimesStats=cts) 
+}
 
 #' parses the run info
 #'
@@ -958,10 +1012,14 @@ parseRunInfo <- function(path){
        layout <- xmlAttrs(lay[[1]])
        layoutN <- as.integer(layout)
        names(layoutN) <- names(layout)
-       list(flowcell=flowcell, totalCycles=totalCycles, reads=reads, layout=layoutN)	    
-   }else{
-      list(flowcell="NA",totalCycles=0,reads=data.frame(Number=NA,NumCycles=NA,IsIndexedRead=NA))
-   }
+       rapid <- if(layoutN['LaneCount'] == 2){ "rapid" }else{ "HO" }
+       PE <- if(nrow(subset(reads, IsIndexedRead == "N")) == 2){ "PE" }else{ "SR" }      
+       rl <- cut(reads[1,]$NumCycles, breaks=c(0,52,80,103,130,160,220,310,1000), labels=c(50,75,100,125,150,200,300,1000))
+       modus <- paste(PE,":",rl,sep="")
+       list(flowcell=flowcell, totalCycles=totalCycles, reads=reads, layout=layoutN, PE=PE, rl=rl, modus=modus, rapid=rapid)	    
+   } else {
+      list(flowcell="NA",totalCycles=0,reads=data.frame(Number=NA,NumCycles=NA,IsIndexedRead=NA), layout=NA, PE=NA, rl=NA, modus=NA, rapid=NA )
+   } 
 }
 
 
