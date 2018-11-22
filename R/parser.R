@@ -989,7 +989,12 @@ runFoldersInInterval <- function(paths, fromTo){
 #'
 #' @export
 allMetaFromFolder <- function(path){
-  rp <- parseRunParameters(paste(path, "runParameters.xml",sep="/"))
+  rppath <- if(file.exists(paste(path, "RunParameters.xml",sep="/")){
+               paste(path, "RunParameters.xml",sep="/")
+            } else {
+               paste(path, "runParameters.xml",sep="/")
+            } 
+  rp <- parseRunParameters(rppath)
   ri <- parseRunInfo(paste(path, "RunInfo.xml", sep="/"))
   ct <- parseCycleTimes(paste(path, "/Logs/CycleTimes.txt",sep=""))
   cts <- if(! is.null(ct)){ cycleTimesStats(ct) }else{ NULL }
