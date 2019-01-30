@@ -28,6 +28,7 @@ screenshot:
 
 TODO
 ----
+ - switch binary parsing backend to https://github.com/Illumina/interop
  - [] make Q30,Q20 mean/median/truncated mean identical to illuminas (don't really know what illumina uses).
  - [] table of data
  - [] add request to server for sample info metadata
@@ -49,6 +50,13 @@ REMARK:
      qmet <- qualityMetricsParser4()$toStats(qmet)
    ```
 - MiSeq is not supported
+- NextSeq is not supported
+- NovaSeq is not supported
+
+If there is time in the future, the backend parsing will be done by
+https://github.com/Illumina/interop and this package will only create a website with the data
+
+
 
 
 
