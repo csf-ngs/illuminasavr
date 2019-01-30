@@ -967,8 +967,8 @@ parseCycleTimes <- function(path){
 #'
 #' @export
 cycleTimesStats <- function(cycleTimes){
-  secondsPerCycle <- ddply(cycleTimes, .(Cycle), summarize, seconds=interval(dateTime[1],dateTime[4]) ) 
-  runLength <- interval(cycleTimes$dateTime[1],cycleTimes$dateTime[nrow(cycleTimes)]) 
+  secondsPerCycle <- ddply(cycleTimes, .(Cycle), summarize, seconds=lubridate::interval(dateTime[1],dateTime[4]) ) 
+  runLength <- lubridate::interval(cycleTimes$dateTime[1],cycleTimes$dateTime[nrow(cycleTimes)]) 
   list(secondsPerCycle=secondsPerCycle,runLength=runLength,meanSecondsPerCycle=mean(secondsPerCycle$seconds))
 }
 
@@ -989,7 +989,7 @@ runFoldersInInterval <- function(paths, fromTo){
 #'
 #' @export
 allMetaFromFolder <- function(path){
-  rppath <- if(file.exists(paste(path, "RunParameters.xml",sep="/")){
+  rppath <- if(file.exists(paste(path, "RunParameters.xml",sep="/"))){
                paste(path, "RunParameters.xml",sep="/")
             } else {
                paste(path, "runParameters.xml",sep="/")
@@ -1011,8 +1011,9 @@ parseRunInfo <- function(path){
 	   reads <- do.call(rbind.data.frame,lapply(getNodeSet(x, "//Read"), function(r){ t(data.frame(xmlAttrs(r))) }))
 	   reads$Number <- as.integer(reads$Number)
 	   reads$NumCycles <- as.integer(reads$NumCycles)
-	   totalCycles <- sum(reads$NumCycles)
+       totalCycles <- sum(reads$NumCycles)
 	   flowcell <- xmlValue(getNodeSet(x,"//Flowcell")[[1]])
+       instrument <- xmlValue(getNodeSet(x,"//Instrument")[[1]])
        runDate <- xmlValue(getNodeSet(x,"//Date")[[1]])
        runDate <- ymd(runDate)
        lay <- getNodeSet(x, "//FlowcellLayout")
@@ -1023,9 +1024,9 @@ parseRunInfo <- function(path){
        PE <- if(nrow(subset(reads, IsIndexedRead == "N")) == 2){ "PE" }else{ "SR" }      
        rl <- cut(reads[1,]$NumCycles, breaks=c(0,52,80,103,130,160,220,310,1000), labels=c(50,75,100,125,150,200,300,1000))
        modus <- paste(PE,":",rl,sep="")
-       list(flowcell=flowcell, totalCycles=totalCycles, reads=reads, layout=layoutN, PE=PE, rl=rl, modus=modus, rapid=rapid, date=runDate)	    
+       list(flowcell=flowcell, totalCycles=totalCycles, instrument=instrument, reads=reads, layout=layoutN, PE=PE, rl=rl, modus=modus, rapid=rapid, date=runDate)	    
    } else {
-      list(flowcell="NA",totalCycles=0,reads=data.frame(Number=NA,NumCycles=NA,IsIndexedRead=NA), layout=NA, PE=NA, rl=NA, modus=NA, rapid=NA, date=runDate)
+      list(flowcell="NA",totalCycles=0, instrument="NA", reads=data.frame(Number=NA,NumCycles=NA,IsIndexedRead=NA), layout=NA, PE=NA, rl=NA, modus=NA, rapid=NA, date=NA)
    } 
 }
 
